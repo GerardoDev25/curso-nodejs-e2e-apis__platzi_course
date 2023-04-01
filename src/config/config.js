@@ -24,6 +24,6 @@ const config = {
 };
 
 // eslint-disable-next-line no-console
-console.log('CONFIG: ', config);
+// console.log('CONFIG: ', config);
 
 module.exports = { config };

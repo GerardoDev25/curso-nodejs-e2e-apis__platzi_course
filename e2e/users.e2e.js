@@ -1,16 +1,18 @@
 const request = require('supertest');
 const createApp = require('../src/app');
 const { models } = require('./../src/db/sequelize');
+const { downSeed, upSeed } = require('./utils/seed');
 
 describe('test for /users path', () => {
   let app = null;
   let server = null;
   let api = null;
 
-  beforeAll(() => {
+  beforeAll(async () => {
     app = createApp();
     server = app.listen(9000);
     api = request(app);
+    await upSeed();
   });
 
   describe('GET /users', () => {
@@ -78,7 +80,8 @@ describe('test for /users path', () => {
     // * test for users
   });
 
-  afterAll(() => {
+  afterAll(async () => {
+    await downSeed();
     server.close();
   });
 });
