@@ -1,5 +1,6 @@
 const request = require('supertest');
 const createApp = require('../src/app');
+const { models } = require('./../src/db/sequelize');
 
 describe('test for /users path', () => {
   let app = null;
@@ -12,7 +13,18 @@ describe('test for /users path', () => {
     api = request(app);
   });
 
-  describe('GET /users', () => {});
+  describe('GET /users', () => {
+    test('should return a users', async () => {
+      const inputId = 1;
+      const user = await models.User.findByPk(inputId);
+
+      const { statusCode, body } = await api.get(`/api/v1/users/${user.id}`);
+
+      expect(statusCode).toEqual(200);
+      expect(body.id).toEqual(user.id);
+      expect(body.email).toEqual(user.email);
+    });
+  });
 
   describe('POST /users', () => {
     test('should return a 400 bad request "invalid password"', async () => {
@@ -42,6 +54,8 @@ describe('test for /users path', () => {
       expect(statusCode).toEqual(400);
       expect(body.message).toMatch(/email/);
     });
+
+    // todo when the data is correct
   });
 
   describe('PUT /users', () => {
