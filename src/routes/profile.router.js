@@ -27,6 +27,7 @@ router.get('/my-user',
     try {
       const userPayload = req.user;
       const user = await userService.findOne(userPayload.sub);
+      delete user.password
       res.json(user);
     } catch (error) {
       next(error);
