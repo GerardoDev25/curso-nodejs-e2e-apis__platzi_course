@@ -6,7 +6,7 @@ describe('test for app', () => {
   let server = null;
   let api = null;
 
-  beforeEach(() => {
+  beforeAll(() => {
     app = createApp();
     server = app.listen(9000);
     api = request(app);
@@ -20,7 +20,17 @@ describe('test for app', () => {
     expect(response.headers['content-type']).toMatch(/json/);
   });
 
-  afterEach(() => {
+  test('GET /hello', async () => {
+    const response = await api.get('/hello').headers({
+      api: '79823',
+    });
+    expect(response).toBeTruthy();
+    expect(response.statusCode).toEqual(200);
+    // expect(response.body.name).toEqual('nico');
+    // expect(response.headers['content-type']).toMatch(/json/);
+  });
+
+  afterAll(() => {
     server.close();
   });
 });
