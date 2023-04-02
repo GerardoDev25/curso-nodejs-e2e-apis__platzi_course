@@ -6,6 +6,7 @@ const { downSeed, upSeed } = require('./utils/umzug');
 describe('test for /users path', () => {
   let app = null;
   let server = null;
+  /** @type {import('supertest').SuperTest<import('supertest').Test>} */
   let api = null;
 
   beforeAll(async () => {
