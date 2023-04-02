@@ -3,6 +3,18 @@ const createApp = require('../src/app');
 const { models } = require('../src/db/sequelize');
 const { downSeed, upSeed } = require('./utils/umzug');
 
+const mockSendMail = jest.fn();
+
+jest.mock('nodemailer', () => {
+  return {
+    createTransport: jest.fn().mockImplementation(() => {
+      return {
+        sendMail: mockSendMail,
+      };
+    }),
+  };
+});
+
 describe('test for /auth path', () => {
   let app = null;
   let server = null;
@@ -45,6 +57,44 @@ describe('test for /auth path', () => {
       expect(body.access_token).toBeTruthy();
       expect(body.user.password).not.toBeTruthy();
       expect(body.user.email).toEqual(user.email);
+    });
+  });
+
+  describe('POST /recovery', () => {
+    beforeAll(() => {
+      mockSendMail.mockClear();
+    });
+
+    test('should return a 401', async () => {
+      const inputData = {
+        email: 'test@fake.com',
+      };
+
+      const { statusCode } = await api
+        .post('/api/v1/auth/recovery')
+        .send(inputData);
+
+      expect(statusCode).toEqual(401);
+    });
+
+    test('should send a mail', async () => {
+      const user = await models.User.findByPk('1');
+
+      const inputData = {
+        email: user.email,
+      };
+
+      mockSendMail.mockResolvedValue(true);
+
+      const { statusCode, body } = await api
+        .post('/api/v1/auth/recovery')
+        .send(inputData);
+
+      console.log(body);
+
+      expect(statusCode).toBe(200);
+      expect(body).toEqual({ message: 'mail sent' });
+      expect(mockSendMail).toHaveBeenCalled();
     });
   });
 
